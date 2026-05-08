@@ -3,11 +3,6 @@
 ## Quick Start
 
 ### Run the Application
-```bash
-cd /home/ishaq-raza-khosa/Desktop/KHizen
-source venv/bin/activate
-python app.py
-```
 
 Open browser: `http://localhost:5000`
 
@@ -20,9 +15,9 @@ Open browser: `http://localhost:5000`
 - Password: `admin123`
 
 This account has admin privileges to:
-- View all complaints
-- Update complaint statuses
-- See analytics dashboard
+ admin can View all complaints
+- can Update complaint statuses
+- & See analytics dashboard
 
 ---
 
@@ -33,8 +28,8 @@ This account has admin privileges to:
 Go to: `http://localhost:5000/register`
 
 Fill in the form:
-- **Full Name**: Enter your name
-- **Email Address**: Enter valid email
+- **Full Name**: Enter your full name
+- **Email Address**: Enter a valid email
 - **Verification Code**: (leave empty for now)
 - **Password**: Enter password (min 6 chars)
 - **Confirm Password**: Must match password
@@ -88,9 +83,6 @@ If you forget your password:
 
 ## Database
 
-SQLite database is auto-created at:
-`/home/ishaq-raza-khosa/Desktop/KHizen/database/complaint_system.db`
-
 Default admin user:
 - Email: `admin@complaintsystem.com`
 - Password: `admin123`
@@ -135,8 +127,8 @@ with app.app_context():
 
 Email is configured in `.env` file:
 ```
-EMAIL_USER=irkhosa101@gmail.com
-EMAIL_PASSWORD=uabgvxrlblmwhixr
+EMAIL_USER=azeemsikandarrana@gmail.com
+EMAIL_PASSWORD=123456789
 ```
 
 Using Gmail App Password (recommended for Gmail accounts).
