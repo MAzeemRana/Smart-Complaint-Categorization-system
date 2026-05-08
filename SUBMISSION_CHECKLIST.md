@@ -1,6 +1,6 @@
 # ✅ SUBMISSION CHECKLIST
 
-## What Was Fixed/Implemented
+## What Was Fixed and Implemented
 
 ### Backend Fixes
 - [x] `/register` POST route - Fixed and tested
@@ -37,10 +37,7 @@
 
 ### Step 1: Start the Application
 ```bash
-cd /home/ishaq-raza-khosa/Desktop/KHizen
-source venv/bin/activate
-python app.py
-```
+
 
 ### Step 2: Verify Everything Works
 Run the test suite in another terminal:
