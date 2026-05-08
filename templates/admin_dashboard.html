@@ -1,0 +1,301 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Smart Complaint System{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Admin Dashboard</h2>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="metric-card bg-primary text-white">
+            <div class="metric-card-icon"><i class="fas fa-clipboard-list"></i></div>
+            <div>
+                <span>Total Complaints</span>
+                <h3>{{ total_complaints }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="metric-card bg-warning text-white">
+            <div class="metric-card-icon"><i class="fas fa-hourglass-half"></i></div>
+            <div>
+                <span>Pending</span>
+                <h3>{{ pending_complaints }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="metric-card bg-success text-white">
+            <div class="metric-card-icon"><i class="fas fa-check-circle"></i></div>
+            <div>
+                <span>Resolved</span>
+                <h3>{{ resolved_complaints }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="metric-card bg-info text-white">
+            <div class="metric-card-icon"><i class="fas fa-percent"></i></div>
+            <div>
+                <span>Resolution Rate</span>
+                <h3>{{ "%.1f"|format((resolved_complaints/total_complaints*100) if total_complaints > 0 else 0) }}%</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-lg-4">
+        <div class="card panel-card mb-4">
+            <div class="card-body">
+                <h6 class="text-uppercase text-muted mb-3">Top insight</h6>
+                <p class="lead mb-2">Most active category</p>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="insight-badge">{{ top_category }}</div>
+                    <div>
+                        <h3 class="mb-0">{{ top_category_count }}</h3>
+                        <small class="text-muted">Complaints in this category</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card panel-card mb-4">
+            <div class="card-body">
+                <h6 class="text-uppercase text-muted mb-3">Status overview</h6>
+                <p class="mb-2">The dashboard highlights the most important numbers so you can act fast.</p>
+                <div class="d-flex gap-2 flex-wrap">
+                    <span class="status-chip status-pending">Pending</span>
+                    <span class="status-chip status-resolved">Resolved</span>
+                    <span class="status-chip status-open">Open</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card chart-card">
+                    <div class="card-header">
+                        <h5>By Category</h5>
+                    </div>
+                    <div class="card-body chart-container">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card chart-card">
+                    <div class="card-header">
+                        <h5>By Priority</h5>
+                    </div>
+                    <div class="card-body chart-container">
+                        <canvas id="priorityChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card chart-card">
+                    <div class="card-header">
+                        <h5>Status Summary</h5>
+                    </div>
+                    <div class="card-body chart-container">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card chart-card">
+                    <div class="card-header">
+                        <h5>Monthly Complaints</h5>
+                    </div>
+                    <div class="card-body chart-container">
+                        <canvas id="monthlyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h5>All Complaints</h5>
+                    <p class="mb-0 text-muted">Change complaint status directly from this admin panel. Users will see the updated status immediately.</p>
+                </div>
+                <span class="badge bg-secondary">Total {{ total_complaints }}</span>
+            </div>
+            <div class="card-body table-responsive" style="max-height: 520px; overflow-y: auto;">
+                <table class="table table-hover table-striped align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Title</th>
+                            <th scope="col">Category</th>
+                            <th scope="col">Priority</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">User</th>
+                            <th scope="col">Date</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for complaint in complaints %}
+                        <tr>
+                            <td>#{{ complaint.id }}</td>
+                            <td>{{ complaint.title }}</td>
+                            <td><span class="badge bg-info">{{ complaint.category }}</span></td>
+                            <td><span class="badge bg-{{ 'danger' if complaint.priority == 'High' else 'warning' if complaint.priority == 'Medium' else 'secondary' }}">{{ complaint.priority }}</span></td>
+                            <td>
+                                <div class="input-group input-group-sm">
+                                    <select class="form-select complaint-status" data-id="{{ complaint.id }}">
+                                        <option value="Pending" {% if complaint.status == 'Pending' %}selected{% endif %}>Pending</option>
+                                        <option value="Resolved" {% if complaint.status == 'Resolved' %}selected{% endif %}>Resolved</option>
+                                    </select>
+                                </div>
+                            </td>
+                            <td>
+                                <strong>{{ complaint.user.name }}</strong><br>
+                                <span class="text-muted small">{{ complaint.user.email }}</span>
+                            </td>
+                            <td>{{ complaint.created_at.strftime('%Y-%m-%d') }}</td>
+                            <td>
+                                <div class="d-flex flex-wrap gap-1 align-items-center">
+                                    <a href="{{ url_for('complaint_detail', complaint_id=complaint.id) }}" class="btn btn-sm btn-action btn-view">
+                                        View
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-action btn-save btn-primary update-status-btn" data-id="{{ complaint.id }}">
+                                        Save
+                                    </button>
+                                    <form method="post" action="{{ url_for('delete_complaint', complaint_id=complaint.id) }}" onsubmit="return confirm('Delete this complaint?');">
+                                        <button type="submit" class="btn btn-sm btn-action btn-delete">Delete</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+var categoryData = {{ complaints_by_category|tojson }};
+var priorityData = {{ complaints_by_priority|tojson }};
+var statusData = {{ complaints_by_status|tojson }};
+var monthlyData = {{ monthly_counts|tojson }};
+
+var categoryCtx = document.getElementById('categoryChart').getContext('2d');
+new Chart(categoryCtx, {
+    type: 'doughnut',
+    data: {
+        labels: categoryData.map(item => item[0]),
+        datasets: [{
+            data: categoryData.map(item => item[1]),
+            backgroundColor: ['#1e3a8a', '#2563eb', '#0284c7', '#0ea5e9', '#38bdf8', '#60a5fa'],
+            borderColor: '#ffffff',
+            borderWidth: 2
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { position: 'bottom' },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        var value = context.raw;
+                        var total = context.dataset.data.reduce(function(sum, v) { return sum + v; }, 0);
+                        var percent = total ? (value / total * 100).toFixed(1) : 0;
+                        return context.label + ': ' + value + ' (' + percent + '%)';
+                    }
+                }
+            }
+        }
+    }
+});
+
+var priorityCtx = document.getElementById('priorityChart').getContext('2d');
+new Chart(priorityCtx, {
+    type: 'bar',
+    data: {
+        labels: priorityData.map(item => item[0]),
+        datasets: [{
+            label: 'Complaints',
+            data: priorityData.map(item => item[1]),
+            backgroundColor: ['#facc15', '#fb923c', '#ef4444']
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                callbacks: {
+                    label: function(context) { return context.dataset.label + ': ' + context.parsed.y; }
+                }
+            }
+        },
+        scales: {
+            y: { beginAtZero: true, ticks: { precision: 0 } }
+        }
+    }
+});
+
+var statusCtx = document.getElementById('statusChart').getContext('2d');
+new Chart(statusCtx, {
+    type: 'doughnut',
+    data: {
+        labels: statusData.map(item => item[0]),
+        datasets: [{
+            data: statusData.map(item => item[1]),
+            backgroundColor: ['#22c55e', '#facc15', '#ef4444'],
+            borderColor: '#ffffff',
+            borderWidth: 2
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { position: 'bottom' },
+            tooltip: {
+                callbacks: {
+                    label: function(context) { return context.label + ': ' + context.raw; }
+                }
+            }
+        }
+    }
+});
+
+var monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+var gradient = monthlyCtx.createLinearGradient(0, 0, 0, 250);
+gradient.addColorStop(0, 'rgba(37, 99, 235, 0.4)');
+gradient.addColorStop(1, 'rgba(37, 99, 235, 0.05)');
+new Chart(monthlyCtx, {
+    type: 'line',
+    data: {
+        labels: monthlyData.map(item => item[0]),
+        datasets: [{
+            label: 'Complaints per Month',
+            data: monthlyData.map(item => item[1]),
+            borderColor: '#2563eb',
+            backgroundColor: gradient,
+            fill: true,
+            pointRadius: 4,
+            tension: 0.35
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: { beginAtZero: true, ticks: { precision: 0 } }
+        }
+    }
+});
+</script>
+{% endblock %}

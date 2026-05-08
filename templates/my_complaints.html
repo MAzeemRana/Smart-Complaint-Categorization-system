@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}My Complaints - Smart Complaint System{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">My Complaints</h2>
+
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Priority</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for complaint in complaints %}
+            <tr>
+                <td>#{{ complaint.id }}</td>
+                <td>{{ complaint.title }}</td>
+                <td><span class="badge bg-info">{{ complaint.category }}</span></td>
+                <td>
+                    <span class="badge bg-{{ 'danger' if complaint.priority == 'High' else 'warning' if complaint.priority == 'Medium' else 'secondary' }}">
+                        {{ complaint.priority }}
+                    </span>
+                </td>
+                <td>
+                    <span class="badge bg-{{ 'success' if complaint.status == 'Resolved' else 'warning' if complaint.status == 'In Progress' else 'secondary' }}">
+                        {{ complaint.status }}
+                    </span>
+                </td>
+                <td>{{ complaint.created_at.strftime('%Y-%m-%d') }}</td>
+                <td>
+                    <div class="d-flex flex-wrap gap-1">
+                        <a href="{{ url_for('complaint_detail', complaint_id=complaint.id) }}" class="btn btn-sm btn-action btn-view">
+                            View
+                        </a>
+                        <form method="post" action="{{ url_for('delete_complaint', complaint_id=complaint.id) }}" onsubmit="return confirm('Delete this complaint?');">
+                            <button type="submit" class="btn btn-sm btn-action btn-delete">Delete</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    {% if not complaints %}
+        <div class="alert alert-info">
+            No complaints found. <a href="{{ url_for('submit_complaint') }}">Submit your first complaint</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

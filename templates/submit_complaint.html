@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Submit Complaint - Smart Complaint System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4><i class="fas fa-pen"></i> Submit New Complaint</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="6" required 
+                                  placeholder="Please describe your complaint in detail..."></textarea>
+                        <small class="text-muted">Our AI will automatically categorize your complaint</small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="priority" class="form-label">Priority Level</label>
+                        <select class="form-control" id="priority" name="priority" required>
+                            <option value="Low">Low - General inquiry or minor issue</option>
+                            <option value="Medium" selected>Medium - Standard complaint requiring attention</option>
+                            <option value="High">High - Urgent issue needing immediate resolution</option>
+                        </select>
+                        <small class="text-muted">Select the priority level for your complaint</small>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit Complaint</button>
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5><i class="fas fa-robot"></i> How AI Helps</h5>
+            </div>
+            <div class="card-body">
+                <p>Our intelligent system will:</p>
+                <ul>
+                    <li><i class="fas fa-tag text-primary"></i> Automatically categorize your complaint</li>
+                    <li><i class="fas fa-mail-bulk text-info"></i> Route to appropriate department</li>
+                    <li><i class="fas fa-clock text-warning"></i> You can set priority level manually</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
